@@ -20,7 +20,9 @@ import Debug.Trace
 import qualified Numeric.LinearAlgebra as L
 import qualified Numeric.LinearAlgebra.Devel as L
 
--- TODO: Provide version using 'Either'.
+
+
+  -- TODO: Provide version using 'Either'.
 
 -- | Shrinkage based covariance estimator.
 --
@@ -31,19 +33,17 @@ covariance ::
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
-  L.Matrix Double
+  L.Herm Double
 covariance xs
   | n < 2 = error "covariance: Need more than one sample."
   | otherwise = covariance' im sigma mu d2 b2 a2
   where
     n = L.rows xs
     p = L.cols xs
-    (means, sigma') = L.meanCov xs
-    -- Maybe I should change the type signatures to use Herm.
-    sigma = L.unSym sigma'
+    (means, sigma) = L.meanCov xs
     subtractFromCols zss ys = L.mapMatrixWithIndex (\(_, j) x -> x - ys VS.! j) zss
     xsCentered = subtractFromCols xs means
-    im = L.ident p
+    im = L.trustSym $ L.ident p
     mu = muE im sigma
     d2 = d2E im sigma mu
     b2 = b2E xsCentered sigma d2
@@ -70,34 +70,31 @@ frobenius xs ys
 -- Estimator of mu (Lemma 3.2).
 muE ::
   -- Identity matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   -- Sample covariance matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   Double
--- NOTE: Strictly speaking, 'flip' is required here to fulfill the formulas
--- given in Lemma 3.2. However, both matrices are symmetric and so, it can be
--- omitted. See 'frobenius'.
-muE = frobenius
+muE im sigma = frobenius (L.unSym sigma) (L.unSym im)
 
 -- Estimator of d2 (Lemma 3.3).
 d2E ::
   -- Identity matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   -- Sample covariance matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   -- Estimate of mu.
   Double ->
   Double
 d2E im sigma mu = frobenius m m
   where
-    m = sigma - L.scale mu im
+    m = L.unSym sigma - L.scale mu (L.unSym im)
 
 -- Estimator of b2 (Lemma 3.4).
 b2E ::
   -- Data matrix.
   L.Matrix Double ->
   -- Sample covariance matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   -- Estimate of d2.
   Double ->
   Double
@@ -112,7 +109,7 @@ b2E xs sigma = min b2m
     ys =
       [ frobenius d d
         | y <- L.toRows xs,
-          let d = (L.asColumn y L.<> L.asRow y) - sigma
+          let d = (L.asColumn y L.<> L.asRow y) - L.unSym sigma
       ]
     b2m = recip (n * n) * foldl' (+) 0 ys
 
@@ -127,9 +124,9 @@ a2E d2 b2 = d2 - b2
 
 covariance' ::
   -- Identity matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   -- Sample covariance matrix.
-  L.Matrix Double ->
+  L.Herm Double ->
   -- Estimate of mu.
   Double ->
   -- Estimate of d2.
@@ -138,5 +135,8 @@ covariance' ::
   Double ->
   -- Estimate of a2.
   Double ->
-  L.Matrix Double
-covariance' im sigma mu d2 b2 a2 = L.scale (b2 / d2 * mu) im + L.scale (a2 / d2) sigma
+  L.Herm Double
+covariance' im sigma mu d2 b2 a2 =
+  L.trustSym $
+    L.scale (b2 / d2 * mu) (L.unSym im)
+      + L.scale (a2 / d2) (L.unSym sigma)
