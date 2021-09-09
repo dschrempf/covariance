@@ -19,6 +19,8 @@ import qualified Numeric.LinearAlgebra as L
 
 -- TODO: Provide version using 'Either'.
 
+-- TODO: Proofreading and tests, there is a dimensionality problem!
+
 -- | Shrinkage based covariance estimator.
 --
 -- See Ledoit, O., & Wolf, M., A well-conditioned estimator for
