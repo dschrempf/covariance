@@ -1,0 +1,2 @@
+* Shrinkage
+Shrinkage estimator of covariance matrices, see autocite:Ledoit2004.

@@ -1,0 +1,7 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:shrinkage"
+
+    - path: "test"
+      component: "shrinkage:test:shrinkage-test"
