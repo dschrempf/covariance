@@ -17,6 +17,8 @@ where
 import Data.Foldable
 import qualified Numeric.LinearAlgebra as L
 
+-- TODO: Provide version using 'Either'.
+
 -- | Shrinkage based covariance estimator.
 --
 -- See Ledoit, O., & Wolf, M., A well-conditioned estimator for
@@ -27,7 +29,17 @@ covariance ::
   -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
   L.Matrix Double
-covariance xs = undefined
+covariance xs
+  | n < 2 = error "covariance: Need more than one sample."
+  | otherwise = covariance' im sigma mu d2 b2 a2
+  where n = L.rows xs
+        p = L.cols xs
+        sigma = L.scale (recip $ fromIntegral n) $ xs L.<> L.tr' xs
+        im = L.ident p
+        mu = muE im sigma
+        d2 = d2E im sigma mu
+        b2 = b2E xs sigma d2
+        a2 = a2E d2 b2
 
 -- Inner product for symmetric matrices based on an adjusted Frobenius norm (p
 -- 376).
