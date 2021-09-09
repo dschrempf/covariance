@@ -1,6 +1,6 @@
 -- |
--- Module      :  Statistics.Shrinkage
--- Description :  Well-conditioned estimation of large-dimensional covariance matrices
+-- Module      :  Statistics.Covariance.LedoitWolf
+-- Description :  Shrinkage based covariance estimator
 -- Copyright   :  (c) 2021 Dominik Schrempf
 -- License     :  GPL-3.0-or-later
 --
@@ -9,8 +9,8 @@
 -- Portability :  portable
 --
 -- Creation date: Thu Sep  9 14:08:26 2021.
-module Statistics.Shrinkage
-  ( covariance,
+module Statistics.Covariance.LedoitWolf
+  ( ledoitWolf,
   )
 where
 
@@ -20,23 +20,21 @@ import Debug.Trace
 import qualified Numeric.LinearAlgebra as L
 import qualified Numeric.LinearAlgebra.Devel as L
 
-
-
-  -- TODO: Provide version using 'Either'.
+-- TODO: Provide version using 'Either'.
 
 -- | Shrinkage based covariance estimator.
 --
 -- See Ledoit, O., & Wolf, M., A well-conditioned estimator for
 -- large-dimensional covariance matrices, Journal of Multivariate Analysis,
 -- 88(2), 365–411 (2004). http://dx.doi.org/10.1016/s0047-259x(03)00096-4.
-covariance ::
+ledoitWolf ::
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
   L.Herm Double
-covariance xs
-  | n < 2 = error "covariance: Need more than one sample."
-  | otherwise = covariance' im sigma mu d2 b2 a2
+ledoitWolf xs
+  | n < 2 = error "ledoitWolf: Need more than one sample."
+  | otherwise = ledoitWolf' im sigma mu d2 b2 a2
   where
     n = L.rows xs
     p = L.cols xs
@@ -122,7 +120,7 @@ a2E ::
   Double
 a2E d2 b2 = d2 - b2
 
-covariance' ::
+ledoitWolf' ::
   -- Identity matrix.
   L.Herm Double ->
   -- Sample covariance matrix.
@@ -136,7 +134,7 @@ covariance' ::
   -- Estimate of a2.
   Double ->
   L.Herm Double
-covariance' im sigma mu d2 b2 a2 =
+ledoitWolf' im sigma mu d2 b2 a2 =
   L.trustSym $
     L.scale (b2 / d2 * mu) (L.unSym im)
       + L.scale (a2 / d2) (L.unSym sigma)

@@ -1,7 +1,9 @@
 
-# Shrinkage
+# Covariance
 
-Shrinkage estimator of covariance matrices <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>.
+Covariance estimators:
+
+-   Shrinkage based estimator by Ledoit and Wolf <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>.
 
 
 # Footnotes

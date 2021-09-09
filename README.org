@@ -1,5 +1,6 @@
-* Shrinkage
-Shrinkage estimator of covariance matrices [fn:1].
+* Covariance
+Covariance estimators:
+- Shrinkage based estimator by Ledoit and Wolf [fn:1].
 
 * Footnotes
 [fn:1] Ledoit, O., & Wolf, M., A well-conditioned estimator for

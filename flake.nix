@@ -1,5 +1,5 @@
 {
-  description = "Shrinkage development environment";
+  description = "Covariance estimation development environment";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
@@ -24,16 +24,16 @@
             pkgs = import nixpkgs {
               inherit system;
             };
-            shrinkage = pkgs.haskellPackages.callCabal2nix "shrinkage" ./. rec {};
-            shrinkage-dev = pkgs.haskell.lib.doBenchmark shrinkage;
+            covariance = pkgs.haskellPackages.callCabal2nix "covariance" ./. rec {};
+            covariance-dev = pkgs.haskell.lib.doBenchmark covariance;
           in
             {
-              packages.shrinkage = shrinkage;
+              packages.covariance = covariance;
 
-              defaultPackage = shrinkage;
+              defaultPackage = covariance;
 
               devShell = pkgs.haskellPackages.shellFor {
-                packages = _: [ shrinkage-dev ];
+                packages = _: [ covariance-dev ];
                 buildInputs = with pkgs; [
                   # See https://github.com/NixOS/nixpkgs/issues/59209.
                   bashInteractive

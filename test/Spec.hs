@@ -1,6 +1,6 @@
 -- |
 -- Module      :  Spec
--- Description :  Shrinkage test suite
+-- Description :  Covariance test suite
 -- Copyright   :  (c) 2021 Dominik Schrempf
 -- License     :  GPL-3.0-or-later
 --

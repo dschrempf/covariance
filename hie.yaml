@@ -1,7 +1,7 @@
 cradle:
   cabal:
     - path: "src"
-      component: "lib:shrinkage"
+      component: "lib:covariance"
 
     - path: "test"
-      component: "shrinkage:test:shrinkage-test"
+      component: "covariance:test:covariance-test"
