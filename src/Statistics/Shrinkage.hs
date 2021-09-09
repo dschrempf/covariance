@@ -15,11 +15,12 @@ module Statistics.Shrinkage
 where
 
 import Data.Foldable
+import qualified Data.Vector.Storable as VS
+import Debug.Trace
 import qualified Numeric.LinearAlgebra as L
+import qualified Numeric.LinearAlgebra.Devel as L
 
 -- TODO: Provide version using 'Either'.
-
--- TODO: Proofreading and tests, there is a dimensionality problem!
 
 -- | Shrinkage based covariance estimator.
 --
@@ -34,14 +35,19 @@ covariance ::
 covariance xs
   | n < 2 = error "covariance: Need more than one sample."
   | otherwise = covariance' im sigma mu d2 b2 a2
-  where n = L.rows xs
-        p = L.cols xs
-        sigma = L.scale (recip $ fromIntegral n) $ xs L.<> L.tr' xs
-        im = L.ident p
-        mu = muE im sigma
-        d2 = d2E im sigma mu
-        b2 = b2E xs sigma d2
-        a2 = a2E d2 b2
+  where
+    n = L.rows xs
+    p = L.cols xs
+    (means, sigma') = L.meanCov xs
+    -- Maybe I should change the type signatures to use Herm.
+    sigma = L.unSym sigma'
+    subtractFromCols zss ys = L.mapMatrixWithIndex (\(_, j) x -> x - ys VS.! j) zss
+    xsCentered = subtractFromCols xs means
+    im = L.ident p
+    mu = muE im sigma
+    d2 = d2E im sigma mu
+    b2 = b2E xsCentered sigma d2
+    a2 = a2E d2 b2
 
 -- Inner product for symmetric matrices based on an adjusted Frobenius norm (p
 -- 376).
@@ -97,7 +103,7 @@ b2E ::
   Double
 b2E xs sigma = min b2m
   where
-    n = fromIntegral $ L.rows sigma
+    n = fromIntegral $ L.rows xs
     -- NOTE: The authors use a transposed data matrix. They refer to one out of
     -- n columns, each with p rows. Here, we have one out of n rows, each with p
     -- columns.
