@@ -1,5 +1,11 @@
 
 # Shrinkage
 
-Shrinkage estimator of covariance matrices, see <sup id="f0f04c74b31283b1a98124805bd7f0f3"><a href="#Ledoit2004" title="Ledoit \&amp; Wolf, A well-conditioned estimator for large-dimensional  covariance matrices, {Journal of Multivariate Analysis}, v(2), 365--411 (2004).">Ledoit2004</a></sup>.
+Shrinkage estimator of covariance matrices <sup><a id="fnr.1" class="footref" href="#fn.1">1</a></sup>.
 
+
+# Footnotes
+
+<sup><a id="fn.1" href="#fnr.1">1</a></sup> Ledoit, O., & Wolf, M., A well-conditioned estimator for
+large-dimensional covariance matrices, Journal of Multivariate Analysis, 88(2),
+365–411 (2004). <http://dx.doi.org/10.1016/s0047-259x(03)00096-4>.
