@@ -18,15 +18,19 @@ maintainer:         dominik.schrempf@gmail.com
 -- A copyright notice.
 -- copyright:
 category:
-  Math
-  Statistics
+    Math
+  , Statistics
 extra-source-files: CHANGELOG.md
 
 library
-    exposed-modules:  Statistics.Covariance.LedoitWolf
+    exposed-modules:
+      Statistics.Covariance.LedoitWolf
+      Statistics.Covariance.RaoBlackwellLedoitWolf
 
-    -- Modules included in this library but not exported.
-    -- other-modules:
+    other-modules:
+      Statistics.Covariance.Internal.Tools
+
+    ghc-options: -Wall -Wunused-packages
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

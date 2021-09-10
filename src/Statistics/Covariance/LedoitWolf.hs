@@ -1,6 +1,6 @@
 -- |
 -- Module      :  Statistics.Covariance.LedoitWolf
--- Description :  Shrinkage based covariance estimator
+-- Description :  Shrinkage based covariance estimator by Ledoit and Wolf
 -- Copyright   :  (c) 2021 Dominik Schrempf
 -- License     :  GPL-3.0-or-later
 --
@@ -15,64 +15,75 @@ module Statistics.Covariance.LedoitWolf
 where
 
 import Data.Foldable
-import qualified Data.Vector.Storable as VS
-import Debug.Trace
 import qualified Numeric.LinearAlgebra as L
-import qualified Numeric.LinearAlgebra.Devel as L
+import Statistics.Covariance.Internal.Tools
 
--- TODO: Provide version using 'Either'.
-
--- | Shrinkage based covariance estimator.
+-- | Shrinkage based covariance estimator by Ledoit and Wolf.
 --
 -- See Ledoit, O., & Wolf, M., A well-conditioned estimator for
 -- large-dimensional covariance matrices, Journal of Multivariate Analysis,
 -- 88(2), 365–411 (2004). http://dx.doi.org/10.1016/s0047-259x(03)00096-4.
+--
+-- Return 'Left' if
+--
+-- - dimensions do not match;
+--
+-- - only one sample is available.
+--
+-- - no parameters are available.
+--
+-- NOTE: This function may still fail due to partial library functions.
 ledoitWolf ::
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
-  L.Herm Double
+  Either String (L.Herm Double)
 ledoitWolf xs
-  | n < 2 = error "ledoitWolf: Need more than one sample."
-  | otherwise = ledoitWolf' im sigma mu d2 b2 a2
+  | n < 2 = Left "ledoitWolf: Need more than one sample."
+  | p < 1 = Left "ledoitWolf: Need at least one parameter."
+  | otherwise = do
+    d2 <- d2E im sigma mu
+    b2 <- b2E xsCentered sigma d2
+    let rho = b2 / d2
+    -- The Ledoit and Wolf shrinkage estimator of the covariance matrix
+    -- (Equation 14). However, a different, more general formula avoiding a2 is
+    -- used. See Equation (4) in Chen2010b.
+    Right $ shrinkWith rho sigma mu im
   where
     n = L.rows xs
     p = L.cols xs
     (means, sigma) = L.meanCov xs
-    subtractFromCols zss ys = L.mapMatrixWithIndex (\(_, j) x -> x - ys VS.! j) zss
-    xsCentered = subtractFromCols xs means
+    xsCentered = centerWith means xs
     im = L.trustSym $ L.ident p
-    mu = muE im sigma
-    d2 = d2E im sigma mu
-    b2 = b2E xsCentered sigma d2
-    a2 = a2E d2 b2
+    mu = muE sigma
 
 -- Inner product for symmetric matrices based on an adjusted Frobenius norm (p
 -- 376).
 --
 -- NOTE: This function is commutative (and therefor qualified as an inner
 -- product) for symmetric matrices only, and not in the general case.
-frobenius :: L.Matrix Double -> L.Matrix Double -> Double
+frobenius :: L.Matrix Double -> L.Matrix Double -> Either String Double
 frobenius xs ys
-  | xsRows /= xsCols = error "frobenius: Left matrix is not square."
-  | ysRows /= ysCols = error "frobenius: Right matrix is not square."
-  | xsRows /= ysRows = error "frobenius: Matrices have different size."
-  | otherwise = recip (fromIntegral xsRows) * trace (xs L.<> L.tr' ys)
+  | xsRows /= xsCols = Left "frobenius: Left matrix is not square."
+  | ysRows /= ysCols = Left "frobenius: Right matrix is not square."
+  | xsRows /= ysRows = Left "frobenius: Matrices have different size."
+  | otherwise = Right $ recip (fromIntegral xsRows) * trace (xs L.<> L.tr' ys)
   where
     xsRows = L.rows xs
     xsCols = L.cols xs
     ysRows = L.rows ys
     ysCols = L.cols ys
-    trace = L.sumElements . L.takeDiag
 
 -- Estimator of mu (Lemma 3.2).
 muE ::
-  -- Identity matrix.
-  L.Herm Double ->
   -- Sample covariance matrix.
   L.Herm Double ->
   Double
-muE im sigma = frobenius (L.unSym sigma) (L.unSym im)
+-- Avoid matrix multiplication in Frobenius norm.
+muE sigma' = recip xsRows * trace sigma
+  where
+    sigma = L.unSym sigma'
+    xsRows = fromIntegral $ L.rows sigma
 
 -- Estimator of d2 (Lemma 3.3).
 d2E ::
@@ -82,7 +93,7 @@ d2E ::
   L.Herm Double ->
   -- Estimate of mu.
   Double ->
-  Double
+  Either String Double
 d2E im sigma mu = frobenius m m
   where
     m = L.unSym sigma - L.scale mu (L.unSym im)
@@ -95,46 +106,20 @@ b2E ::
   L.Herm Double ->
   -- Estimate of d2.
   Double ->
-  Double
-b2E xs sigma = min b2m
-  where
-    n = fromIntegral $ L.rows xs
-    -- NOTE: The authors use a transposed data matrix. They refer to one out of
-    -- n columns, each with p rows. Here, we have one out of n rows, each with p
-    -- columns.
-    --
-    -- Long story short. Each y is an observation, a vector of length p.
-    ys =
+  Either String Double
+b2E xs sigma d2 = do
+  -- NOTE: The authors use a transposed data matrix. They refer to one out of
+  -- n columns, each with p rows. Here, we have one out of n rows, each with p
+  -- columns.
+  --
+  -- Long story short. Each y is an observation, a vector of length p.
+  ys <-
+    sequence
       [ frobenius d d
         | y <- L.toRows xs,
           let d = (L.asColumn y L.<> L.asRow y) - L.unSym sigma
       ]
-    b2m = recip (n * n) * foldl' (+) 0 ys
-
--- Estimator of a2 (Lemma 3.5).
-a2E ::
-  -- Estimate of d2.
-  Double ->
-  -- Estimate of b2.
-  Double ->
-  Double
-a2E d2 b2 = d2 - b2
-
-ledoitWolf' ::
-  -- Identity matrix.
-  L.Herm Double ->
-  -- Sample covariance matrix.
-  L.Herm Double ->
-  -- Estimate of mu.
-  Double ->
-  -- Estimate of d2.
-  Double ->
-  -- Estimate of b2.
-  Double ->
-  -- Estimate of a2.
-  Double ->
-  L.Herm Double
-ledoitWolf' im sigma mu d2 b2 a2 =
-  L.trustSym $
-    L.scale (b2 / d2 * mu) (L.unSym im)
-      + L.scale (a2 / d2) (L.unSym sigma)
+  let b2m = recip (n * n) * foldl' (+) 0 ys
+  Right $ min b2m d2
+  where
+    n = fromIntegral $ L.rows xs
