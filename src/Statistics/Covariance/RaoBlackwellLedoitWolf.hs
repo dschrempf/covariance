@@ -55,11 +55,11 @@ raoBlackwellLedoitWolf xs
     -- Trace of (sigma squared).
     s2 = let s = L.unSym sigma in s L.<> s
     trS2 = trace s2
-    -- Shrinkage factor (Equation 17).
+    -- Shrinkage factor (Equation 17, and 19).
     n' = fromIntegral n
     p' = fromIntegral p
     rhoNominator = ((n' - 2) / n') * trS2 + tr2S
     rhoDenominator = (n' + 2) * (trS2 - recip p' * tr2S)
-    rho = rhoNominator / rhoDenominator
+    rho = min (rhoNominator / rhoDenominator) 1.0
     -- Scaling factor of the identity matrix (Equation 3).
     mu = trS / p'
