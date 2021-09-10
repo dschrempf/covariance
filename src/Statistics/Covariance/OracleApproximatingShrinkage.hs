@@ -14,6 +14,7 @@ module Statistics.Covariance.OracleApproximatingShrinkage
   )
 where
 
+import Debug.Trace hiding (trace)
 import qualified Numeric.LinearAlgebra as L
 import Statistics.Covariance.Internal.Tools
 
@@ -50,14 +51,13 @@ oracleApproximatingShrinkage xs
     -- Trace of (sigma squared).
     s2 = let s = L.unSym sigma in s L.<> s
     trS2 = trace s2
-    -- Phi (Equation  25).
+    -- NOTE: Equation 25 specifying phi is erroneous.
+    -- Shrinkage factor (Equation 23).
     n' = fromIntegral n
     p' = fromIntegral p
-    phiNominator = trS2 - recip p' * tr2S
-    phiDenominator = trS2 + negate (recip p') * tr2S
-    phi = phiNominator / phiDenominator
-    -- Shrinkage factor (Equation 23, and 32).
-    rho' = p' * recip ((n' - 1) * phi)
+    rhoNominator = tr2S - recip p' * trS2
+    rhoDenominator = (n' - 1 / p') * ( trS2 - recip p' * tr2S)
+    rho' = traceShowId $ rhoNominator / rhoDenominator
     rho = min rho' 1.0
     -- Scaling factor of the identity matrix (Equation 3).
     mu = trS / p'

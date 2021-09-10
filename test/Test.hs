@@ -53,3 +53,6 @@ estimators =
 
 unitTests :: TestTree
 unitTests = testGroup "Unit tests" $ unitTestsForEstimators estimators
+
+-- import qualified Numeric.LinearAlgebra as L
+-- let m = L.gaussianSample 666 30 (L.fromList [0..40]) (L.trustSym $ L.diagl [1..41])

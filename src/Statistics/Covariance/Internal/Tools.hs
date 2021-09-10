@@ -43,7 +43,7 @@ shrinkWith ::
   L.Herm Double
 shrinkWith rho sigma mu im
   | rho < 0.0 = error "shrinkWith: Bug! Shrinkage factor is negative."
-  | rho < 1.0 = error "shrinkWith: Bug! Shrinkage factor is larger than 1.0."
+  | rho > 1.0 = error "shrinkWith: Bug! Shrinkage factor is larger than 1.0."
   | mu < 0.0 = error "shrinkWith: Bug! Scaling factor of identity matrix is negative."
   | rho == 1.0 = L.trustSym $ L.scale mu (L.unSym im)
   | otherwise =
