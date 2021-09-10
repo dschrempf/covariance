@@ -30,8 +30,6 @@ centerWith ::
 centerWith ms = L.mapMatrixWithIndex (\(_, j) x -> x - ms VS.! j)
 
 -- Shrinkage a covariance matrix.
---
--- Call 'error' if the shrinkage factor is out of bounds.
 shrinkWith ::
   -- Shrinkage factor.
   Double ->
