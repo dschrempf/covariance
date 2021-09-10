@@ -26,13 +26,11 @@ import Statistics.Covariance.Internal.Tools
 --
 -- Return 'Left' if
 --
--- - dimensions do not match;
---
 -- - only one sample is available.
 --
 -- - no parameters are available.
 --
--- NOTE: This function may still fail due to partial library functions.
+-- NOTE: This function may fail due to partial library functions.
 ledoitWolf ::
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
@@ -41,14 +39,10 @@ ledoitWolf ::
 ledoitWolf xs
   | n < 2 = Left "ledoitWolf: Need more than one sample."
   | p < 1 = Left "ledoitWolf: Need at least one parameter."
-  | otherwise = do
-    d2 <- d2E im sigma mu
-    b2 <- b2E xsCentered sigma d2
-    let rho = b2 / d2
-    -- The Ledoit and Wolf shrinkage estimator of the covariance matrix
-    -- (Equation 14). However, a different, more general formula avoiding a2 is
-    -- used. See Equation (4) in Chen2010b.
-    Right $ shrinkWith rho sigma mu im
+  -- The Ledoit and Wolf shrinkage estimator of the covariance matrix
+  -- (Equation 14). However, a different, more general formula avoiding a2 is
+  -- used. See Equation (4) in Chen2010b.
+  | otherwise = Right $ shrinkWith rho sigma mu im
   where
     n = L.rows xs
     p = L.cols xs
@@ -56,18 +50,21 @@ ledoitWolf xs
     xsCentered = centerWith means xs
     im = L.trustSym $ L.ident p
     mu = muE sigma
+    d2 = d2E im sigma mu
+    b2 = b2E xsCentered sigma d2
+    rho = b2 / d2
 
 -- Inner product for symmetric matrices based on an adjusted Frobenius norm (p
 -- 376).
 --
 -- NOTE: This function is commutative (and therefor qualified as an inner
 -- product) for symmetric matrices only, and not in the general case.
-frobenius :: L.Matrix Double -> L.Matrix Double -> Either String Double
+frobenius :: L.Matrix Double -> L.Matrix Double -> Double
 frobenius xs ys
-  | xsRows /= xsCols = Left "frobenius: Left matrix is not square."
-  | ysRows /= ysCols = Left "frobenius: Right matrix is not square."
-  | xsRows /= ysRows = Left "frobenius: Matrices have different size."
-  | otherwise = Right $ recip (fromIntegral xsRows) * trace (xs L.<> L.tr' ys)
+  | xsRows /= xsCols = error "frobenius: Bug! Left matrix is not square."
+  | ysRows /= ysCols = error "frobenius: Bug! Right matrix is not square."
+  | xsRows /= ysRows = error "frobenius: Bug! Matrices have different size."
+  | otherwise = recip (fromIntegral xsRows) * trace (xs L.<> L.tr' ys)
   where
     xsRows = L.rows xs
     xsCols = L.cols xs
@@ -93,7 +90,7 @@ d2E ::
   L.Herm Double ->
   -- Estimate of mu.
   Double ->
-  Either String Double
+  Double
 d2E im sigma mu = frobenius m m
   where
     m = L.unSym sigma - L.scale mu (L.unSym im)
@@ -106,20 +103,18 @@ b2E ::
   L.Herm Double ->
   -- Estimate of d2.
   Double ->
-  Either String Double
-b2E xs sigma d2 = do
-  -- NOTE: The authors use a transposed data matrix. They refer to one out of
-  -- n columns, each with p rows. Here, we have one out of n rows, each with p
-  -- columns.
-  --
-  -- Long story short. Each y is an observation, a vector of length p.
-  ys <-
-    sequence
+  Double
+b2E xs sigma = min b2m
+  where
+    n = fromIntegral $ L.rows xs
+    -- NOTE: The authors use a transposed data matrix. They refer to one out of
+    -- n columns, each with p rows. Here, we have one out of n rows, each with p
+    -- columns.
+    --
+    -- Long story short. Each y is an observation, a vector of length p.
+    ys =
       [ frobenius d d
         | y <- L.toRows xs,
           let d = (L.asColumn y L.<> L.asRow y) - L.unSym sigma
       ]
-  let b2m = recip (n * n) * foldl' (+) 0 ys
-  Right $ min b2m d2
-  where
-    n = fromIntegral $ L.rows xs
+    b2m = recip (n * n) * foldl' (+) 0 ys
