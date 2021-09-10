@@ -26,14 +26,9 @@ library
     exposed-modules:
       Statistics.Covariance.LedoitWolf
       Statistics.Covariance.RaoBlackwellLedoitWolf
-
     other-modules:
       Statistics.Covariance.Internal.Tools
-
     ghc-options: -Wall -Wunused-packages
-
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
     build-depends:    base ^>=4.14.3.0
                     , hmatrix
                     , vector
@@ -44,5 +39,10 @@ test-suite covariance-test
     default-language: Haskell2010
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
-    main-is:          Spec.hs
+    main-is:          Test.hs
+    ghc-options: -Wall -Wunused-packages
     build-depends:    base ^>=4.14.3.0
+                    , covariance
+                    , hmatrix
+                    , tasty
+                    , tasty-hunit

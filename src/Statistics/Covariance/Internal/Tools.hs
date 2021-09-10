@@ -46,7 +46,7 @@ shrinkWith ::
 shrinkWith rho sigma mu im
   | 0 > rho = error "shrinkWith: Bug! Shrinkage factor is negative."
   | 1 < rho = error "shrinkWith: Bug! Shrinkage factor is larger than 1.0."
-  | 0 < mu = error "shrinkWith: Bug! Scaling factor of identity matrix is negative."
+  | 0 > mu = error "shrinkWith: Bug! Scaling factor of identity matrix is negative."
   | otherwise =
     L.trustSym $
       L.scale (1.0 - rho) (L.unSym sigma)
