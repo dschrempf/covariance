@@ -1,6 +1,6 @@
 -- |
--- Module      :  Statistics.Covariance.RaoBlackwellLedoitWolf
--- Description :  Improved shrinkage based covariance estimator
+-- Module      :  Statistics.Covariance.OracleApproximatingShrinkage
+-- Description :  Iterative shrinkage based covariance estimator
 -- Copyright   :  (c) 2021 Dominik Schrempf
 -- License     :  GPL-3.0-or-later
 --
@@ -8,17 +8,16 @@
 -- Stability   :  experimental
 -- Portability :  portable
 --
--- Creation date: Fri Sep 10 09:26:58 2021.
-module Statistics.Covariance.RaoBlackwellLedoitWolf
-  ( raoBlackwellLedoitWolf,
+-- Creation date: Fri Sep 10 13:58:15 2021.
+module Statistics.Covariance.OracleApproximatingShrinkage
+  ( oracleApproximatingShrinkage,
   )
 where
 
 import qualified Numeric.LinearAlgebra as L
 import Statistics.Covariance.Internal.Tools
 
--- | Improved shrinkage based covariance estimator by Ledoit and Wolf using the
--- Rao-Blackwell theorem.
+-- | Iterative shrinkage based covariance estimator.
 --
 -- See Chen, Y., Wiesel, A., Eldar, Y. C., & Hero, A. O., Shrinkage algorithms
 -- for mmse covariance estimation, IEEE Transactions on Signal Processing,
@@ -31,16 +30,14 @@ import Statistics.Covariance.Internal.Tools
 -- - no parameters are available.
 --
 -- NOTE: This function may fail due to partial library functions.
-raoBlackwellLedoitWolf ::
+oracleApproximatingShrinkage ::
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
   Either String (L.Herm Double)
-raoBlackwellLedoitWolf xs
-  | n < 2 = Left "raoBlackwellLedoitWolf: Need more than one sample."
-  | p < 1 = Left "raoBlackwellLedoitWolf: Need at least one parameter."
-  -- Rao-Blackwell Ledoit and Wolf shrinkage estimator of the covariance matrix
-  -- (Equation 16).
+oracleApproximatingShrinkage xs
+  | n < 2 = Left "oracleApproximatingShrinkage: Need more than one sample."
+  | p < 1 = Left "oracleApproximatingShrinkage: Need at least one parameter."
   | otherwise = Right $ shrinkWith rho sigma mu im
   where
     n = L.rows xs
@@ -53,12 +50,14 @@ raoBlackwellLedoitWolf xs
     -- Trace of (sigma squared).
     s2 = let s = L.unSym sigma in s L.<> s
     trS2 = trace s2
-    -- Shrinkage factor (Equation 17, and 19).
+    -- Phi (Equation  25).
     n' = fromIntegral n
     p' = fromIntegral p
-    rhoNominator = ((n' - 2) / n') * trS2 + tr2S
-    rhoDenominator = (n' + 2) * (trS2 - recip p' * tr2S)
-    rho' = rhoNominator / rhoDenominator
+    phiNominator = trS2 - recip p' * tr2S
+    phiDenominator = trS2 + negate (recip p') * tr2S
+    phi = phiNominator / phiDenominator
+    -- Shrinkage factor (Equation 23, and 32).
+    rho' = p' * recip ((n' - 1) * phi)
     rho = min rho' 1.0
     -- Scaling factor of the identity matrix (Equation 3).
     mu = trS / p'

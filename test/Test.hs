@@ -17,6 +17,7 @@ where
 import Data.Either
 import qualified Numeric.LinearAlgebra as L
 import Statistics.Covariance.LedoitWolf
+import Statistics.Covariance.OracleApproximatingShrinkage
 import Statistics.Covariance.RaoBlackwellLedoitWolf
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -46,7 +47,8 @@ unitTestsForEstimators = concatMap unitTestsForEstimator
 estimators :: [Estimator]
 estimators =
   [ (ledoitWolf, "ledoitWolf"),
-    (raoBlackwellLedoitWolf, "raoBlackwellLedoitWolf")
+    (raoBlackwellLedoitWolf, "raoBlackwellLedoitWolf"),
+    (oracleApproximatingShrinkage, "oracleApproximatingShrinkage")
   ]
 
 unitTests :: TestTree

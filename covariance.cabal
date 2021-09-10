@@ -26,6 +26,7 @@ library
     exposed-modules:
       Statistics.Covariance.LedoitWolf
       Statistics.Covariance.RaoBlackwellLedoitWolf
+      Statistics.Covariance.OracleApproximatingShrinkage
     other-modules:
       Statistics.Covariance.Internal.Tools
     ghc-options: -Wall -Wunused-packages
