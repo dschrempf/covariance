@@ -24,8 +24,10 @@
             pkgs = import nixpkgs {
               inherit system;
             };
-            covariance = pkgs.haskellPackages.callCabal2nix "covariance" ./. rec {};
-            covariance-dev = pkgs.haskell.lib.doBenchmark covariance;
+            hpkgs = pkgs.haskellPackages;
+            hlib = pkgs.haskell.lib;
+            covariance = hpkgs.callCabal2nix "covariance" ./. rec {};
+            covariance-dev = hlib.doBenchmark covariance;
           in
             {
               packages.covariance = covariance;
