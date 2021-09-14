@@ -1,8 +1,14 @@
 * Covariance
-Covariance estimators:
-- Shrinkage based estimator by Ledoit and Wolf [fn:1].
+Shrinkage based covariance estimators:
+- Ledoit and Wolf [fn:1].
+- Improved Ledoit and Wolf estimator using the Rao-Blackwell theorem [fn:2].
+- Oracle approximating shrinkage estimator [fn:2].
 
 * Footnotes
+[fn:2] Chen, Y., Wiesel, A., Eldar, Y. C., & Hero, A. O., Shrinkage algorithms
+for mmse covariance estimation, IEEE Transactions on Signal Processing,
+58(10), 5016–5029 (2010). http://dx.doi.org/10.1109/tsp.2010.2053029.
+
 [fn:1] Ledoit, O., & Wolf, M., A well-conditioned estimator for
 large-dimensional covariance matrices, Journal of Multivariate Analysis, 88(2),
 365–411 (2004). http://dx.doi.org/10.1016/s0047-259x(03)00096-4.

@@ -13,6 +13,9 @@ module Statistics.Covariance
   ( empiricalCovariance,
 
     -- * Shrinkage based estimators
+    --
+    -- | See the overview on shrinkage estimators provided by
+    -- [scikit-learn](https://scikit-learn.org/dev/modules/covariance.html#shrunk-covariance).
     module Statistics.Covariance.LedoitWolf,
     module Statistics.Covariance.RaoBlackwellLedoitWolf,
     module Statistics.Covariance.OracleApproximatingShrinkage,
