@@ -5,7 +5,7 @@ synopsis:
     Well-conditioned estimation of large-dimensional covariance matrices
 
 -- A longer description of the package.
--- description:
+description:        Please see the README on GitHub at <https://github.com/dschrempf/covariance#readme>
 homepage:           https://github.com/dschrempf/covariance
 
 -- A URL where users can report bugs.
