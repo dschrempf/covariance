@@ -30,7 +30,7 @@ import Statistics.Covariance.Internal.Tools
 --
 -- - no parameters are available.
 --
--- NOTE: This function may fail due to partial library functions.
+-- NOTE: This function may call 'error' due to partial library functions.
 raoBlackwellLedoitWolf ::
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
