@@ -16,9 +16,7 @@ where
 
 import Data.Either
 import qualified Numeric.LinearAlgebra as L
-import Statistics.Covariance.LedoitWolf
-import Statistics.Covariance.OracleApproximatingShrinkage
-import Statistics.Covariance.RaoBlackwellLedoitWolf
+import Statistics.Covariance
 import Test.Tasty
 import Test.Tasty.HUnit
 
