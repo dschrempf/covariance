@@ -24,10 +24,11 @@ extra-source-files: CHANGELOG.md
 
 library
     exposed-modules:
+      Statistics.Covariance
+    other-modules:
       Statistics.Covariance.LedoitWolf
       Statistics.Covariance.RaoBlackwellLedoitWolf
       Statistics.Covariance.OracleApproximatingShrinkage
-    other-modules:
       Statistics.Covariance.Internal.Tools
     ghc-options: -Wall -Wunused-packages
     build-depends:    base ^>=4.14.3.0
