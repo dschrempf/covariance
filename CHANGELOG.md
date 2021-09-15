@@ -5,6 +5,11 @@
 ## Unreleased changes
 
 
+## 0.1.0.3
+
+-   Fix tests and docs.
+
+
 ## 0.1.0.2
 
 -   `scale`, `rescaleWith` functions.
