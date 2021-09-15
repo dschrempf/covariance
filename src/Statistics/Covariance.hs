@@ -23,6 +23,7 @@ module Statistics.Covariance
 
     -- * Helper functions
     scale,
+    rescaleWith,
   )
 where
 
@@ -67,6 +68,8 @@ scaleWith ms ss = L.mapMatrixWithIndex (\(_, j) x -> (x - ms VS.! j) / (ss VS.! 
 -- 1.0. The estimated covariance matrix of a scaled data matrix is a correlation
 -- matrix, which is easier to estimate.
 scale ::
+  -- | Data matrix of dimension NxP, where N is the number of observations, and
+  -- P is the number of parameters.
   L.Matrix Double ->
   -- | (Means, Standard deviations, Centered and scaled matrix)
   (L.Vector Double, L.Vector Double, L.Matrix Double)
@@ -75,3 +78,14 @@ scale xs = (ms, ss, scaleWith ms ss xs)
     msVs = map S.meanVariance $ L.toColumns xs
     ms = L.fromList $ map fst msVs
     ss = L.fromList $ map (sqrt . snd) msVs
+
+-- | Convert a correlation matrix with given standard deviations to original
+-- scale.
+rescaleWith ::
+  -- | Vector of standard deviations (length P)
+  L.Vector Double ->
+  -- | Correlation matrix.
+  L.Matrix Double ->
+  -- | Covariance matrix.
+  L.Matrix Double
+rescaleWith ss = L.mapMatrixWithIndex (\(i, j) x -> x * (ss VS.! i) * (ss VS.! j))

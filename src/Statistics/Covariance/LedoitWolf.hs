@@ -17,6 +17,7 @@ where
 import Data.Foldable
 import qualified Numeric.LinearAlgebra as L
 import Statistics.Covariance.Internal.Tools
+import Statistics.Covariance.Types
 
 -- | Shrinkage based covariance estimator by Ledoit and Wolf.
 --
@@ -32,11 +33,12 @@ import Statistics.Covariance.Internal.Tools
 --
 -- NOTE: This function may call 'error' due to partial library functions.
 ledoitWolf ::
+  DoCenter ->
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
   Either String (L.Herm Double)
-ledoitWolf xs
+ledoitWolf c xs
   | n < 2 = Left "ledoitWolf: Need more than one sample."
   | p < 1 = Left "ledoitWolf: Need at least one parameter."
   -- The Ledoit and Wolf shrinkage estimator of the covariance matrix
@@ -47,7 +49,9 @@ ledoitWolf xs
     n = L.rows xs
     p = L.cols xs
     (means, sigma) = L.meanCov xs
-    xsCentered = centerWith means xs
+    xsCentered = case c of
+      DoCenter -> centerWith means xs
+      AssumeCentered -> xs
     im = L.trustSym $ L.ident p
     mu = muE sigma
     d2 = d2E im sigma mu

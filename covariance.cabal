@@ -26,6 +26,7 @@ library
     exposed-modules:
       Statistics.Covariance
     other-modules:
+      Statistics.Covariance.Types
       Statistics.Covariance.LedoitWolf
       Statistics.Covariance.RaoBlackwellLedoitWolf
       Statistics.Covariance.OracleApproximatingShrinkage
