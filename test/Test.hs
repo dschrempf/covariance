@@ -46,7 +46,8 @@ estimators :: [Estimator]
 estimators =
   [ (ledoitWolf DoCenter, "ledoitWolf"),
     (raoBlackwellLedoitWolf, "raoBlackwellLedoitWolf"),
-    (oracleApproximatingShrinkage, "oracleApproximatingShrinkage")
+    (oracleApproximatingShrinkage, "oracleApproximatingShrinkage"),
+    (fmap fst . graphicalLasso 1.0, "graphicalLasso")
   ]
 
 unitTests :: TestTree

@@ -7,6 +7,11 @@
 
 ## 0.1.0.3
 
+-   Graphical lasso (for now only re-export from `glasso` library).
+
+
+## 0.1.0.3
+
 -   Fix tests and docs.
 
 

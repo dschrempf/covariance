@@ -21,6 +21,9 @@ module Statistics.Covariance
     module Statistics.Covariance.RaoBlackwellLedoitWolf,
     module Statistics.Covariance.OracleApproximatingShrinkage,
 
+    -- * Gaussian graphical model based estimators
+    module Statistics.Covariance.GraphicalLasso,
+
     -- * Misc
     DoCenter (..),
 
@@ -33,6 +36,7 @@ where
 import qualified Data.Vector.Storable as VS
 import qualified Numeric.LinearAlgebra as L
 import qualified Numeric.LinearAlgebra.Devel as L
+import Statistics.Covariance.GraphicalLasso
 import Statistics.Covariance.LedoitWolf
 import Statistics.Covariance.OracleApproximatingShrinkage
 import Statistics.Covariance.RaoBlackwellLedoitWolf
@@ -72,8 +76,8 @@ scaleWith ms ss = L.mapMatrixWithIndex (\(_, j) x -> (x - ms VS.! j) / (ss VS.! 
 -- 1.0. The estimated covariance matrix of a scaled data matrix is a correlation
 -- matrix, which is easier to estimate.
 scale ::
-  -- | Data matrix of dimension NxP, where N is the number of observations, and
-  -- P is the number of parameters.
+  -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
+  -- of samples (rows), and \(p\) is the number of parameters (columns).
   L.Matrix Double ->
   -- | (Means, Standard deviations, Centered and scaled matrix)
   (L.Vector Double, L.Vector Double, L.Matrix Double)
@@ -86,10 +90,10 @@ scale xs = (ms, ss, scaleWith ms ss xs)
 -- | Convert a correlation matrix with given standard deviations to original
 -- scale.
 rescaleWith ::
-  -- | Vector of standard deviations (length P)
+  -- | Vector of standard deviations of length \(p\).
   L.Vector Double ->
-  -- | Correlation matrix.
+  -- | Correlation matrix of dimension \(p \times p\).
   L.Matrix Double ->
-  -- | Covariance matrix.
+  -- | Covariance matrix of dimension \(p \times p\).
   L.Matrix Double
 rescaleWith ss = L.mapMatrixWithIndex (\(i, j) x -> x * (ss VS.! i) * (ss VS.! j))
