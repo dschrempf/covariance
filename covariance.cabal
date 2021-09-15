@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               covariance
-version:            0.1.0.2
+version:            0.1.0.3
 synopsis:
     Well-conditioned estimation of large-dimensional covariance matrices
 
