@@ -31,14 +31,17 @@ import qualified Numeric.LinearAlgebra as L
 --
 -- Return 'Left' if
 --
+-- - the regularization parameter is out of bounds \([0, \infty)\).
+--
 -- - only one sample is available.
 --
 -- - no parameters are available.
 --
 -- NOTE: This function may call 'error' due to partial library functions.
 graphicalLasso ::
-  -- | Lasso parameter; penalty for non-zero covariances. The higher the lasso
-  -- parameter, the sparser the estimated covariance matrix.
+  -- | Regularization or lasso parameter; penalty for non-zero covariances. The
+  -- higher the lasso parameter, the sparser the estimated inverse covariance
+  -- matrix. Must be non-negative.
   Double ->
   -- | Sample data matrix of dimension \(n \times p\), where \(n\) is the number
   -- of samples (rows), and \(p\) is the number of parameters (columns).
@@ -46,6 +49,7 @@ graphicalLasso ::
   -- | @Either ErrorString (Covariance matrix, Precision matrix)@.
   Either String (L.Herm Double, L.Herm Double)
 graphicalLasso l xs
+  | l < 0 = Left "graphicalLasso: Regularization parameter is negative."
   | n < 2 = Left "graphicalLasso: Need more than one sample."
   | p < 1 = Left "graphicalLasso: Need at least one parameter."
   | otherwise =
