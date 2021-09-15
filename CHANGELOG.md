@@ -5,7 +5,7 @@
 ## Unreleased changes
 
 
-## 0.1.0.3
+## 0.1.0.4
 
 -   Graphical lasso (for now only re-export from `glasso` library).
 
