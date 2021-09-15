@@ -44,7 +44,7 @@ unitTestsForEstimators = concatMap unitTestsForEstimator
 
 estimators :: [Estimator]
 estimators =
-  [ (ledoitWolf, "ledoitWolf"),
+  [ (ledoitWolf DoCenter, "ledoitWolf"),
     (raoBlackwellLedoitWolf, "raoBlackwellLedoitWolf"),
     (oracleApproximatingShrinkage, "oracleApproximatingShrinkage")
   ]

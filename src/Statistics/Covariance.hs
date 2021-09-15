@@ -21,6 +21,9 @@ module Statistics.Covariance
     module Statistics.Covariance.RaoBlackwellLedoitWolf,
     module Statistics.Covariance.OracleApproximatingShrinkage,
 
+    -- * Misc
+    DoCenter (..),
+
     -- * Helper functions
     scale,
     rescaleWith,
@@ -33,6 +36,7 @@ import qualified Numeric.LinearAlgebra.Devel as L
 import Statistics.Covariance.LedoitWolf
 import Statistics.Covariance.OracleApproximatingShrinkage
 import Statistics.Covariance.RaoBlackwellLedoitWolf
+import Statistics.Covariance.Types
 import qualified Statistics.Sample as S
 
 -- | Empirical or sample covariance.
