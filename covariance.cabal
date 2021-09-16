@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               covariance
-version:            0.1.0.4
+version:            0.1.0.5
 synopsis:
     Well-conditioned estimation of large-dimensional covariance matrices
 
@@ -33,7 +33,7 @@ library
       Statistics.Covariance.RaoBlackwellLedoitWolf
       Statistics.Covariance.Types
     ghc-options: -Wall -Wunused-packages
-    build-depends:    base ^>=4.14.3.0
+    build-depends:    base == 4.*
                     , glasso
                     , hmatrix
                     , statistics
@@ -47,7 +47,7 @@ test-suite covariance-test
     hs-source-dirs:   test
     main-is:          Test.hs
     ghc-options: -Wall -Wunused-packages
-    build-depends:    base ^>=4.14.3.0
+    build-depends:    base == 4.*
                     , covariance
                     , hmatrix
                     , tasty
