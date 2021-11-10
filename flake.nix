@@ -34,14 +34,14 @@
 
               defaultPackage = covariance;
 
-              devShell = pkgs.haskellPackages.shellFor {
+              devShell = hpkgs.shellFor {
                 packages = _: [ covariance-dev ];
                 buildInputs = with pkgs; [
                   # See https://github.com/NixOS/nixpkgs/issues/59209.
                   bashInteractive
-                  haskellPackages.cabal-install
-                  haskellPackages.haskell-language-server
-                  haskellPackages.stack
+                  hpkgs.cabal-install
+                  hpkgs.haskell-language-server
+                  hpkgs.stack
                 ];
                 doBenchmark = true;
                 withHoogle = true;
