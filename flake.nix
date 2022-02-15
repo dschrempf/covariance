@@ -41,7 +41,6 @@
                   bashInteractive
                   hpkgs.cabal-install
                   hpkgs.haskell-language-server
-                  hpkgs.stack
                 ];
                 doBenchmark = true;
                 withHoogle = true;
