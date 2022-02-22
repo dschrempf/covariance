@@ -53,8 +53,8 @@ graphicalLasso l xs
   | n < 2 = Left "graphicalLasso: Need more than one sample."
   | p < 1 = Left "graphicalLasso: Need at least one parameter."
   | otherwise =
-    Right $
-      bimap convert convert $ glasso p (L.flatten $ L.unSym sigma) l
+      Right $
+        bimap convert convert $ glasso p (L.flatten $ L.unSym sigma) l
   where
     n = L.rows xs
     p = L.cols xs

@@ -55,7 +55,7 @@ oracleApproximatingShrinkage xs
     n' = fromIntegral n
     p' = fromIntegral p
     rhoNominator = tr2S - recip p' * trS2
-    rhoDenominator = (n' - 1 / p') * ( trS2 - recip p' * tr2S)
+    rhoDenominator = (n' - 1 / p') * (trS2 - recip p' * tr2S)
     rho' = rhoNominator / rhoDenominator
     rho = min rho' 1.0
     -- Scaling factor of the identity matrix (Equation 3).

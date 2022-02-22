@@ -47,9 +47,9 @@ shrinkWith rho sigma mu im
   | mu < 0.0 = error "shrinkWith: Bug! Scaling factor of identity matrix is negative."
   | rho == 1.0 = L.trustSym $ L.scale mu (L.unSym im)
   | otherwise =
-    L.trustSym $
-      L.scale (1.0 - rho) (L.unSym sigma)
-        + L.scale (rho * mu) (L.unSym im)
+      L.trustSym $
+        L.scale (1.0 - rho) (L.unSym sigma)
+          + L.scale (rho * mu) (L.unSym im)
 
 -- Trace of a matrix.
 trace :: L.Matrix Double -> Double
