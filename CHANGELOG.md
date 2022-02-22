@@ -5,6 +5,11 @@
 ## Unreleased changes
 
 
+## 0.1.0.5
+
+-   Tooling updates.
+
+
 ## 0.1.0.4
 
 -   Graphical lasso (for now only re-export from `glasso` library).
