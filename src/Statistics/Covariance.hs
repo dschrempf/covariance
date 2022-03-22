@@ -29,7 +29,8 @@ module Statistics.Covariance
 
     -- * Helper functions
     scale,
-    rescaleWith,
+    rescaleSWith,
+    rescalePWith,
   )
 where
 
@@ -89,11 +90,18 @@ scale xs = (ms, ss, scaleWith ms ss xs)
 
 -- | Convert a correlation matrix with given standard deviations to original
 -- scale.
-rescaleWith ::
+rescaleSWith ::
   -- | Vector of standard deviations of length \(p\).
   L.Vector Double ->
-  -- | Correlation matrix of dimension \(p \times p\).
+  -- | Normalized correlation matrix of dimension \(p \times p\).
   L.Matrix Double ->
-  -- | Covariance matrix of dimension \(p \times p\).
+  -- | Covariance matrix of original scale and of dimension \(p \times p\).
   L.Matrix Double
-rescaleWith ss = L.mapMatrixWithIndex (\(i, j) x -> x * (ss VS.! i) * (ss VS.! j))
+rescaleSWith ss = L.mapMatrixWithIndex (\(i, j) x -> x * (ss VS.! i) * (ss VS.! j))
+
+-- | See 'rescaleSWith' but for precision matrices.
+rescalePWith ::
+  L.Vector Double ->
+  L.Matrix Double ->
+  L.Matrix Double
+rescalePWith ss = rescaleSWith (VS.map recip ss)
