@@ -5,6 +5,13 @@
 ## Unreleased changes
 
 
+## 0.2.0.0
+
+-   Rename `rescaleWith` to `rescaleSWith` to indicate the rescaling of
+    covariance matrices.
+-   Add `rescalePWith` to rescale precision matrices.
+
+
 ## 0.1.0.5
 
 -   Tooling updates.
