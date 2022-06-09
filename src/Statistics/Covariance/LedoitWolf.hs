@@ -1,7 +1,7 @@
 -- |
 -- Module      :  Statistics.Covariance.LedoitWolf
 -- Description :  Shrinkage based covariance estimator by Ledoit and Wolf
--- Copyright   :  (c) 2021 Dominik Schrempf
+-- Copyright   :  2021 Dominik Schrempf
 -- License     :  GPL-3.0-or-later
 --
 -- Maintainer  :  dominik.schrempf@gmail.com
