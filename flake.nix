@@ -30,11 +30,9 @@
         covariance-dev = hlib.doBenchmark covariance;
       in
       {
-        packages.covariance = covariance;
+        packages.default = covariance;
 
-        defaultPackage = covariance;
-
-        devShell = hpkgs.shellFor {
+        devShells.default = hpkgs.shellFor {
           packages = _: [ covariance-dev ];
           buildInputs = with pkgs; [
             # See https://github.com/NixOS/nixpkgs/issues/59209.
