@@ -5,6 +5,11 @@
 ## Unreleased changes
 
 
+## 0.2.0.1
+
+-   Compilation and tooling with GHC 9.2.3.
+
+
 ## 0.2.0.0
 
 -   Rename `rescaleWith` to `rescaleSWith` to indicate the rescaling of
