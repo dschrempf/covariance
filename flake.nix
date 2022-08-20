@@ -24,7 +24,7 @@
         pkgs = import nixpkgs {
           inherit system;
         };
-        hpkgs = pkgs.haskell.packages.ghc923;
+        hpkgs = pkgs.haskell.packages.ghc924;
         hlib = pkgs.haskell.lib;
         covariance = hpkgs.callCabal2nix "covariance" ./. rec { };
         covariance-dev = hlib.doBenchmark covariance;
