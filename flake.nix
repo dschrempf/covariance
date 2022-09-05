@@ -37,6 +37,9 @@
           buildInputs = with pkgs; [
             # See https://github.com/NixOS/nixpkgs/issues/59209.
             bashInteractive
+
+            haskellPackages.cabal-fmt # Build fails for newer hpkgs.
+
             hpkgs.cabal-install
             hpkgs.haskell-language-server
           ];
