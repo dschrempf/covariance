@@ -1,5 +1,5 @@
 {
-  description = "Covariance estimation development environment";
+  description = "Haskell development environment";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
@@ -10,41 +10,60 @@
     , flake-utils
     , nixpkgs
     }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        # haskell-overlay = (
-        #   selfn: supern: {
-        #     haskellPackages = supern.haskellPackages.override {
-        #       overrides = selfh: superh: {};
-        #     };
-        #   }
-        # );
-        # overlays = [ ];
-        pkgs = import nixpkgs {
-          inherit system;
+    let
+      theseHpkgNames = [
+        "covariance"
+      ];
+      thisGhcVersion = "ghc943";
+      # # Only required for projects with multiple packages.
+      # hMkPackage = h: n: h.callCabal2nix n (./. + "/${n}") { };
+      hOverlay = selfn: supern: {
+        haskell = supern.haskell // {
+          packageOverrides = selfh: superh:
+            supern.haskell.packageOverrides selfh superh //
+              {
+                covariance = selfh.callCabal2nix "covariance" ./. { };
+              };
         };
-        hpkgs = pkgs.haskell.packages.ghc924;
-        hlib = pkgs.haskell.lib;
-        covariance = hpkgs.callCabal2nix "covariance" ./. rec { };
-        covariance-dev = hlib.doBenchmark covariance;
-      in
-      {
-        packages.default = covariance;
+      };
+      perSystem = system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ hOverlay ];
+          };
+          hpkgs = pkgs.haskell.packages.${thisGhcVersion};
+          hlib = pkgs.haskell.lib;
+          theseHpkgs = nixpkgs.lib.genAttrs theseHpkgNames (n: hpkgs.${n});
+          theseHpkgsDev = builtins.mapAttrs (_: x: hlib.doBenchmark x) theseHpkgs;
+        in
+        {
+          packages = theseHpkgs // { default = theseHpkgs.covariance; };
 
-        devShells.default = hpkgs.shellFor {
-          packages = _: [ covariance-dev ];
-          buildInputs = with pkgs; [
-            # See https://github.com/NixOS/nixpkgs/issues/59209.
-            bashInteractive
+          devShells.default = hpkgs.shellFor {
+            # shellHook =
+            #   let
+            #     scripts = ./scripts;
+            #   in
+            #   ''
+            #     export PATH="${scripts}:$PATH"
+            #   '';
+            packages = _: (builtins.attrValues theseHpkgsDev);
+            nativeBuildInputs = with pkgs; [
+              # See https://github.com/NixOS/nixpkgs/issues/59209.
+              bashInteractive
 
-            hpkgs.cabal-fmt
-            hpkgs.cabal-install
-            hpkgs.haskell-language-server
-          ];
-          doBenchmark = true;
-          # withHoogle = true;
+              # Haskell toolchain.
+              hpkgs.cabal-fmt
+              hpkgs.cabal-install
+              hpkgs.haskell-language-server
+            ];
+            buildInputs = with pkgs; [
+            ];
+            doBenchmark = true;
+            # withHoogle = true;
+          };
         };
-      }
-    );
+    in
+    { overlays.default = hOverlay; } // flake-utils.lib.eachDefaultSystem perSystem;
 }
