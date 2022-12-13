@@ -1,5 +1,5 @@
 {
-  description = "Haskell development environment";
+  description = "Covariance estimation development environment";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
