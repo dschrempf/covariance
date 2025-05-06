@@ -4,6 +4,8 @@
 
 ## Unreleased changes
 
+-   GHC 9.8
+
 
 ## 0.2.0.1
 
